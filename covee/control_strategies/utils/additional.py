@@ -8,9 +8,8 @@ class additional():
     def convert_index(self,conf_dict):
 
         self.conf_dict = conf_dict
-
-        self.conf_dict["CONTROL_DATA"]["active_nodes"] = list(np.array(self.conf_dict["CONTROL_DATA"]["active_nodes"])-1)
-        self.conf_dict["CONTROL_DATA"]["active_ESS"] = list(np.array(self.conf_dict["CONTROL_DATA"]["active_ESS"])-1)
+        self.conf_dict["CONTROL_DATA"]["active_nodes"] = (np.array(self.conf_dict["CONTROL_DATA"]["active_nodes"])-1).tolist()
+        self.conf_dict["CONTROL_DATA"]["active_ESS"] = (np.array(self.conf_dict["CONTROL_DATA"]["active_ESS"])-1).tolist()
 
         return self.conf_dict
 
@@ -39,7 +38,7 @@ class additional():
                         "nb":nb,
                         "ng":ng,
                         "nbr":nbr, 
-                        "full_nodes": list(np.array(np.matrix(ppc["gen"])[:,0]).flatten()),
+                        "full_nodes": np.array(np.matrix(ppc["gen"])[:,0]).flatten().astype(int).tolist(),
                         "total_control_nodes" : list(set(active_nodes+active_ESS))
                         }
         

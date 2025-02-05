@@ -22,7 +22,8 @@ field_styles=dict(
     programname=dict(color='cyan'),
     name=dict(color='blue')))
 '''
-logging.info("Program Start")
+logging.basicConfig(level = logging.INFO)
+logging.info("Program Start")   ##########
 
 # Read json file and set Control Strategy and Case 
 # =====================================================================================================
@@ -32,6 +33,7 @@ with open("./examples/conf.json", "r") as f:
 module_obj = utils.select(conf_dict)
 Quadratic_Control = module_obj.select_control()
 case = module_obj.select_case()
+logging.info('\'Quadratic_Control\' and \'case\' now refer to specific Python modules.')
 # =====================================================================================================
 
 '''
@@ -43,21 +45,28 @@ case = module_obj.select_case()
 # =====================================================================================================
 additional = utils.additional() 
 
+logging.info('\'additional\' is an additional Class object')
+
 conf_dict = additional.convert_index(conf_dict)
 active_nodes = conf_dict["CONTROL_DATA"]["active_nodes"]   # number of active DGs
 active_ESS = conf_dict["CONTROL_DATA"]["active_ESS"]       # number of active ESSs
+logging.info('1 subtracted form all active_nodes and active_ESS')
 logging.info("active_nodes"+str(active_nodes))
 
 ppc_obj = case.case_()
+logging.info('ppc_obj is a case_ object')
 ppc = ppc_obj.case()
 ppc = ext2int(ppc)      # convert to continuous indexing starting from 0
+logging.info('ppc contains all the case-related information')
 BUS_TYPE = 1
 [grid_data,reactive_power,active_power,active_power_ESS] = additional.system_info(ppc,BUS_TYPE, active_nodes, active_ESS)
 
+logging.info('\'grid_data\', \'reactive_power\', \'active_power\', \'active_power_ESS\' arrays and \'additional\' object are activated.')
 
 # Initialize the control
 # =====================================================================================================
 control = Quadratic_Control.Quadratic_Control(grid_data, active_nodes ,active_ESS, conf_dict["CONTROL_DATA"])
+logging.info('\'control\' object is created')
 [R,X,output] = control.initialize_control()
 save_obj = save_results(voltage_list = [], iterations = [], conf_dict = conf_dict)
 
@@ -91,9 +100,9 @@ with alive_bar(int(len(profiles["gen_profile"]))) as bar:  # declare your expect
         [reactive_power_dict, active_power_dict, active_power_ESS_dict] = additional.update_dict(output, reactive_power_dict, active_power_dict, active_power_ESS_dict)      
         save_obj.save_list(output, v_tot, iter)
 
-        print("voltage ", v_tot)
-        print("pv_input ", profiles["gen_profile"][iter][active_nodes])
-        print("reactive_power_dict ", reactive_power_dict)
+        #print("voltage ", v_tot)
+        #print("pv_input ", profiles["gen_profile"][iter][active_nodes])
+        #print("reactive_power_dict ", reactive_power_dict)
         
         bar()
 

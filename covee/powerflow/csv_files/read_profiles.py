@@ -24,9 +24,8 @@ class read_profiles:
 
         if self.conf_dict["POWERFLOW_DATA"]["TYPE_PROFILE"] == "fix":
             
-            gen_profile = np.tile([self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["GEN_PROFILE"]]*self.grid_data["ng"],(self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["ITERATIONS"],1))
-            load_profile = np.tile([self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["LOAD_PROFILE"]]*self.grid_data["nb"], (self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["ITERATIONS"],1))
-
+            gen_profile = self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["GEN_PROFILE"]*np.ones((self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["ITERATIONS"], self.grid_data["ng"]))
+            load_profile = self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["LOAD_PROFILE"]*np.ones((self.conf_dict["POWERFLOW_DATA"]["PROFILE"]["fix"]["ITERATIONS"], self.grid_data["nb"]))
             return gen_profile, load_profile
 
 

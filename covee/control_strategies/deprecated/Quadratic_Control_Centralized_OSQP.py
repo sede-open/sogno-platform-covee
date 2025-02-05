@@ -39,8 +39,8 @@ class Quadratic_Control():
 
     def initialize_control(self): 
 
-        self.num_pv = list(np.array(self.num_pv))
-        self.bus_values = (np.array(list(range(1,self.num_bus)))).tolist()
+        self.num_pv = np.array(self.num_pv).tolist()
+        self.bus_values = np.array(list(range(1,self.num_bus))).tolist()
         calculate_matrix_full = quadratic_control.matrix_calc(self.grid_data, self.bus_values) 
         [R,X] = calculate_matrix_full.calculate()
         self.additional = quadratic_control.additional(self.bus_values)
@@ -156,4 +156,4 @@ class Quadratic_Control():
 
         self.P_activate = self.additional.prioritize(reactive_power_sol,var["QMIN"],self.P_activate,n,case='prioritize')
 
-        return  (active_power_sol).tolist(), (reactive_power_sol).tolist(), active_power_battery
+        return  active_power_sol.tolist(), reactive_power_sol.tolist(), active_power_battery

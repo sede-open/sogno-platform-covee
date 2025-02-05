@@ -59,8 +59,8 @@ class runPF_class():
 
         # Gather information about the system
         # =============================================================
-        baseMVA, bus, gen, branch, cost, VMAX, VMIN = \
-            ppc["baseMVA"], ppc["bus"], ppc["gen"], ppc["branch"], ppc["gencost"], ppc["VMAX"], ppc["VMIN"]
+        baseMVA, bus, gen, branch = \
+            ppc["baseMVA"], ppc["bus"], ppc["gen"], ppc["branch"]
 
         nb = bus.shape[0]                        # number of buses
         ng = gen.shape[0]                        # number of generators
@@ -78,87 +78,60 @@ class runPF_class():
 
     def run_Power_Flow(self, ppc, active_power,reactive_power,active_power_ess,pv_profile,load_profile):
         ppc = ext2int(ppc)      # convert to continuous indexing starting from 0
-        BUS_TYPE = 1
 
         # Gather information about the system
         # =============================================================
-        baseMVA, bus, gen, branch, cost, VMAX, VMIN = \
-            ppc["baseMVA"], ppc["bus"], ppc["gen"], ppc["branch"], ppc["gencost"], ppc["VMAX"], ppc["VMIN"]
+        gen = ppc["gen"]
 
-        nb = bus.shape[0]                        # number of buses
+        nb = ppc["bus"].shape[0]                        # number of buses
         ng = gen.shape[0]                        # number of generators
-        nbr = branch.shape[0]                    # number of branches
 
-        for i in range(int(nb)):
-            if bus[i][BUS_TYPE] == 3.0:
-                pcc = i
-            else:
-                pass
-
-        c = self.active_nodes
         for i in range(1,ng):
-            if gen[i][0] in c:
+            if gen[i][0] in self.active_nodes:
                 pass
             else:
                 np.delete(ppc["gen"],(i),axis=0)       
 
         #print("Number of Reactive Power Compensator = ",int(len(c)))
-                
-        # initialize vectors
-        # =====================================================================
-        q = [0.0] * int(len(c))
-        p = []
-        v_gen = []
-        v_tot = []
-        p_load = []
-        v_tot = []
-        v_gen = []
-        v_pv = []
-        v_ess = []
 
         ############## SET THE ACTUAL LOAD AND GEN VALUES ###############
         s = 0
-        for i in range(int(nb)):
-            bus[i][PD] = load_profile[i] 
-            bus[i][QD] = 0.0
-            if self.active_ESS != None and any(bus[i][BUS_I] == float(self.active_ESS[k]) for k in range(len(self.active_ESS))):
-                if active_power_ess[s]:
-                    bus[i][PD] = load_profile[i]-active_power_ess[s]
-                    s +=1
+        for i in range(nb):
+            ppc["bus"][i][PD] = load_profile[i] 
+            ppc["bus"][i][QD] = 0.0
+            if self.active_ESS != None and (self.active_ESS == ppc["bus"][i][BUS_I]).any():
+                ppc["bus"][i][PD] = load_profile[i]-active_power_ess[s]
+                s +=1
+        
         r = 0
-        for j in range(int(ng)):
+        for j in range(ng):
             gen[j][PG] = 0.0
             gen[j][QG] = 0.0
-            if any(gen[j][GEN_BUS] == float(self.active_nodes[k]) for k in range(len(self.active_nodes))):
+            if (self.active_nodes == gen[j][GEN_BUS]).any():
                 gen[j][QG] = reactive_power[r]
                 gen[j][PG] = pv_profile[r]+active_power[r]
                 r +=1
             else: 
                 pass
 
-
-        ppc['bus'] = bus
         ppc['gen'] = gen
         ppc = int2ext(ppc)
 
 
         ############# RUN PF ########################
-        opt = ppoption(VERBOSE=0, OUT_ALL=0, UT_SYS_SUM=0)
+        opt = ppoption(VERBOSE=0, OUT_ALL=0, UT_SYS_SUM=0, PF_ALG = 3)
         results = runpf(ppc, opt)
-        bus_results = results[0]['bus']
-
-        for i in self.total_nodes:
-            v_gen.append(bus_results[int(i)][VM])
-        for i in self.full_nodes:
-            v_tot.append(bus_results[int(i)][VM])
-        for i in self.active_nodes:
-            v_pv.append(bus_results[int(i)][VM])
-        if self.active_ESS != None:
-            for i in self.active_ESS:
-                v_ess.append(bus_results[int(i)][VM])
-
-        for i in range(int(len(c))):
-            p.append(gen[i+1][PG])
-            p_load.append(bus[int(c[i])][PD])
         
-        return v_tot,v_gen,p,c,p_load, v_pv, v_ess
+        bus_results = results[0]['bus']
+        v_gen = bus_results.T[VM][self.total_nodes].tolist()
+        v_tot = bus_results.T[VM][self.full_nodes].tolist()
+        v_pv = bus_results.T[VM][self.active_nodes].tolist()
+        if self.active_ESS != None:
+            v_ess = bus_results.T[VM][self.active_ESS].tolist()
+        else:
+            v_ess = []
+
+        p = ppc['gen'].T[PG][1:(len(self.active_nodes)+1)].tolist()     # SUBI - something is wrong here
+        p_load = ppc['bus'].T[PD][self.active_nodes].tolist()           # SUBI - something is wrong here
+        
+        return v_tot,v_gen,p, self.active_nodes, p_load, v_pv, v_ess

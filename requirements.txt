@@ -1,0 +1,13 @@
+coloredlogs
+numpy==1.26.4
+scipy
+PYPOWER
+matplotlib
+ipython
+requests
+paho-mqtt
+alive-progress
+osqp
+cvxpy
+humanfriendly
+pyrlu

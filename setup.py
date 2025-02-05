@@ -11,7 +11,9 @@ requiredPackages = [#should only contain third party pakages
     "paho-mqtt",
     "alive-progress",
     "osqp",
-    "cvxpy"
+    "cvxpy",
+    "humanfriendly",
+    "pyrlu"
 ],
 
 setup(

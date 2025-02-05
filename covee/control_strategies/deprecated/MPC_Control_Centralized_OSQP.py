@@ -41,7 +41,6 @@ class MPC_Control():
 
     def initialize_control(self): 
 
-        self.num_pv = list(np.array(self.num_pv))
         self.bus_values = self.full_nodes[1:]
         self.P_activate = [1e6]*len(self.bus_values)
 

@@ -3,7 +3,7 @@
     "EXT_PORT_POWERFLOW" : 7070,  "__comment__": "Only for the communication",
     "EXT_MQTT" : "no",  "__comment__": "Only for the communication",
 
-    "CONTROL_MODULE" : "Quadratic_Control_Centralized_CVXPY", "__comment__": "in control_strategies_folder",
+    "CONTROL_MODULE" : "Quadratic_Control_Centralized_DualAscent", "__comment__": "in control_strategies_folder",
     "CASE_MODULE" : "case30", "__comment__": "Select the grid",
 
     "CONTROL_DATA" : {
@@ -21,7 +21,7 @@
     "POWERFLOW_DATA" : {
                         "PROFILE" : {"variable" : {"GEN_PROFILE": "PV_profile.csv", "LOAD_PROFILE": "Load_profile.csv"} , 
                                      "fix" : {"GEN_PROFILE": 1.0, "LOAD_PROFILE": 0.2, "ITERATIONS": 50} },
-                        "TYPE_PROFILE" : "variable",  "__comment__": "with fix, the powerflow considers fixed generation and load profiles" 
+                        "TYPE_PROFILE" : "fix",  "__comment__": "with fix, the powerflow considers fixed generation and load profiles" 
 
                     },
 
