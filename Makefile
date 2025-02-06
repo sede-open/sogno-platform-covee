@@ -1,8 +1,6 @@
 SHELL := /bin/bash
 
 init:
-	python3 ./create_env/createEnv.py -y
-	source covee_env/bin/activate -y && \
 	pip install --upgrade pip
 	pip install .
 clean:

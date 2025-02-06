@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 requiredPackages = [#should only contain third party pakages
     "coloredlogs",
-    "numpy",
+    "numpy<2.0.0",
     "scipy",
     "PYPOWER",
     "matplotlib",
