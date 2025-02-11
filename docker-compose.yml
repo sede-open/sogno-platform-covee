@@ -9,7 +9,7 @@ services:
       - ./:/covee
     stdin_open: true
     # command: tail -F dgrthetyj
-    command: bash -c "cd covee/ &&
+    command: bash -c "cd covee &&
                       make init &&
                       python covee_main.py"
     ports:

@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 
 init:
-	pip install --upgrade pip
-	pip install .
+	pip install --upgrade pip --root-user-action=ignore
+	pip install . --root-user-action=ignore
 clean:
 	sudo rm -R -f covee_env
 	rm -R -f __pycache__
