@@ -1,3 +1,0 @@
-[submodule "submodules/dmu"]
-	path = submodules/dmu
-	url = https://git.rwth-aachen.de/acs/public/automation/modules/dmu.git
