@@ -1,0 +1,9 @@
+numpy
+scipy
+PYPOWER
+matplotlib
+ipython
+requests
+coloredlogs
+GitPython
+pyrlu
