@@ -1,0 +1,77 @@
+version: '3.3'
+
+services:
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    environment:
+      - "GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource"
+
+  powerflow:
+    build:
+      context: '.'
+      dockerfile: './powerflow.Dockerfile'
+    volumes:
+      - ./powerflow:/powerflow
+    command: bash -c "cd powerflow && 
+                      make init &&
+                      cd .. &&
+                      /powerflow/powerflow/bin/python3 /powerflow/runPF.py --ext_port 7070"
+    environment:
+      MQTT_ENABLED: "true"
+      MQTTURL: "mqtt"
+      MQTTPORT: "1883"
+    ports:
+      - 7070:8000
+
+  pv_centralized:
+    build:
+      context: '.'
+      dockerfile: './pv_centralized.Dockerfile'
+    volumes:
+      - ./pv_centralized:/pv_centralized
+    command: bash -c "cd pv_centralized && 
+                      make init &&
+                      cd .. &&
+                      /pv_centralized/covee/bin/python3 /pv_centralized/Control_main.py --ext_port 7071"
+    environment:
+      MQTT_ENABLED: "true"
+      MQTTURL: "mqtt"
+      MQTTPORT: "1883"
+    ports:
+      - 7071:8000
+
+  mqtt:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  influxdb:
+    image: influxdb:latest
+    restart: unless-stopped
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_INIT_MODE=setup
+      - INFLUXDB_INIT_USERNAME=niki
+      - INFLUXDB_INIT_PASSWORD=12345678
+      - INFLUXDB_INIT_ORG=iit2
+      - INFLUXDB_INIT_BUCKET=iit2
+      - INFLUXDB_INIT_RETENTION=1d
+    volumes:
+      - ./powerflow/influxdb/data/:/var/lib/influxdb2
+
+  telegraf:
+    image: telegraf:latest
+    depends_on:
+      - influxdb
+      - mqtt
+    environment:
+      - INFLUX_TOKEN=Peor55Eozd_HVMQ7WTm8Yl3FHISshj9BCFxWTMKoQzp8_kS7MRsJiQMK39T1ZQgSqDkODjaOkhXm717yQVhaZQ==
+    command: telegraf --config /etc/telegraf/telegraf.conf
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro

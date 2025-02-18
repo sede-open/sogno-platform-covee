@@ -1,0 +1,12 @@
+[submodule "data"]
+	path = data
+	url = git@git.rwth-aachen.de:acs/public/automation/covee/covee-control-data.git
+[submodule "pv_centralized/submodules/dmu"]
+	path = pv_centralized/submodules/dmu
+	url = git@git.rwth-aachen.de:acs/public/automation/modules/dmu.git
+[submodule "pv_centralized"]
+	path = pv_centralized
+	url = git@git.rwth-aachen.de:acs/public/automation/covee/pv-centralized.git
+[submodule "powerflow"]
+	path = powerflow
+	url = git@git.rwth-aachen.de:acs/public/automation/covee/powerflow.git
